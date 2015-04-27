@@ -9,6 +9,7 @@ import javax.swing.Timer;
 import javax.swing.JPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class Window extends JPanel implements ActionListener {
     private final int WINDOW_WIDTH = 800;
@@ -33,6 +34,8 @@ public class Window extends JPanel implements ActionListener {
     private boolean ballDirectionUp = true;
     private boolean ballDirectionDown = false;
     
+    ArrayList<Brick> elements = new ArrayList<>();
+    
     // Загрузка графики и других ресурсов
     private void loadResources() {
         ImageIcon img_imgBoard = new ImageIcon(getClass().getResource("resources/paddle.png")); 
@@ -52,6 +55,13 @@ public class Window extends JPanel implements ActionListener {
         setFocusable(true);
         setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
         loadResources();
+        
+        elements.add(new Brick(22,23));
+        elements.add(new Brick(42,73));
+        elements.add(new Brick(22,33));
+        elements.add(new Brick(42,73));
+        elements.add(new Brick(22,63));
+        elements.add(new Brick(42,73));
     }
     
     // Прослушка таймера
@@ -178,6 +188,11 @@ public class Window extends JPanel implements ActionListener {
         if (gameOver != true) {
             g.drawImage(imgBall, x, y, this);
         }
+        
+        for (int q=0; q<5; q++) {
+            g.drawImage(elements.get(q).imgBrick, elements.get(q).brickX, elements.get(q).brickY, this);
+        }
+        
         Toolkit.getDefaultToolkit().sync();
         repaint();
         
