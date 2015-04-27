@@ -10,7 +10,6 @@ import javax.swing.JPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-
 public class Window extends JPanel implements ActionListener {
     private final int WINDOW_WIDTH = 800;
     private final int WINDOW_HEIGHT = 700;
@@ -22,7 +21,7 @@ public class Window extends JPanel implements ActionListener {
     private int y = 635;
     private final int boardStepMove = 2;
     private final int ballStepMove = 1;
-    private final int DELAY = 2;
+    private final int DELAY = 1;
     private Timer timer;
     private boolean leftDirection = false;
     private boolean rightDirection = false;
