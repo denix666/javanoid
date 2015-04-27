@@ -56,12 +56,11 @@ public class Window extends JPanel implements ActionListener {
         setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
         loadResources();
         
-        elements.add(new Brick(22,23));
-        elements.add(new Brick(42,73));
-        elements.add(new Brick(22,33));
-        elements.add(new Brick(42,73));
-        elements.add(new Brick(22,63));
-        elements.add(new Brick(42,73));
+        for (int i=1; i<15; i++) {
+            for (int j=1; j<15; j++) {
+                elements.add(new Brick(j*50+4,i*20+4));
+            }
+        }
     }
     
     // Прослушка таймера
@@ -79,10 +78,10 @@ public class Window extends JPanel implements ActionListener {
     
     private void gameOver(Graphics g) {
         String msg = "Game Over";
-        Font small = new Font("Helvetica", Font.BOLD, 14);
+        Font small = new Font("Helvetica", Font.BOLD, 24);
         FontMetrics metr = getFontMetrics(small);
 
-        g.setColor(Color.white);
+        g.setColor(Color.green);
         g.setFont(small);
         g.drawString(msg, (WINDOW_WIDTH - metr.stringWidth(msg)) / 2, WINDOW_HEIGHT / 2);
     }
@@ -178,7 +177,6 @@ public class Window extends JPanel implements ActionListener {
         }
     }
     
-    
     // Отрисовка графических обьектов
     @Override
     public void paintComponent(Graphics g) {
@@ -189,7 +187,7 @@ public class Window extends JPanel implements ActionListener {
             g.drawImage(imgBall, x, y, this);
         }
         
-        for (int q=0; q<5; q++) {
+        for (int q=0; q<196; q++) {
             g.drawImage(elements.get(q).imgBrick, elements.get(q).brickX, elements.get(q).brickY, this);
         }
         
