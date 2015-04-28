@@ -4,22 +4,15 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 
 public class Brick {
-    public Image imgBrick;
-    public int brickX, brickY;
-    boolean destroyed;
+    protected Image img;
+    protected int x,y;
+    protected boolean Destroyed;
     
-    public Brick(int brickX, int brickY) {
-        ImageIcon ii = new ImageIcon(this.getClass().getResource("resources/brick.png"));
-        imgBrick = ii.getImage();
-        this.brickX = brickX;
-        this.brickY = brickY;
-    }
-    
-    public boolean isDestroyed() {
-        return destroyed;
-    }
-
-    public void setDestroyed(boolean destroyed) {
-        this.destroyed = destroyed;
+    public Brick(String brickColor, int x, int y, boolean Destroyed) {
+        ImageIcon ii = new ImageIcon(this.getClass().getResource("resources/brick_" + brickColor + ".png"));
+        img = ii.getImage();
+        
+        this.x = x;
+        this.y = y;
     }
 }

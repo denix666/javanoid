@@ -58,7 +58,7 @@ public class Window extends JPanel implements ActionListener {
         
         for (int i=1; i<15; i++) {
             for (int j=1; j<15; j++) {
-                elements.add(new Brick(j*50+4,i*20+4));
+                elements.add(new Brick("white", j*50+4, i*20+4, false));
             }
         }
     }
@@ -188,7 +188,7 @@ public class Window extends JPanel implements ActionListener {
         }
         
         for (int q=0; q<196; q++) {
-            g.drawImage(elements.get(q).imgBrick, elements.get(q).brickX, elements.get(q).brickY, this);
+            g.drawImage(elements.get(q).img, elements.get(q).x, elements.get(q).y, this);
         }
         
         Toolkit.getDefaultToolkit().sync();
