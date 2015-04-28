@@ -22,19 +22,21 @@ public class Window extends JPanel implements ActionListener {
     private int y = 635;
     private final int boardStepMove = 2;
     private final int ballStepMove = 1;
-    private final int DELAY = 1;
+    private final int DELAY = 3;
     private Timer timer;
     private boolean leftDirection = false;
     private boolean rightDirection = false;
     private boolean inGame = false;
     private boolean gameOver = false;
+    private String brickColor;
     
     private boolean ballDirectionLeft = false;
     private boolean ballDirectionRight = true;
     private boolean ballDirectionUp = true;
     private boolean ballDirectionDown = false;
     
-    ArrayList<Brick> elements = new ArrayList<>();
+    private Brick[] bricks = new Brick[196];
+    
     
     // Загрузка графики и других ресурсов
     private void loadResources() {
@@ -54,11 +56,45 @@ public class Window extends JPanel implements ActionListener {
         setBackground(Color.black);
         setFocusable(true);
         setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
-        loadResources();
+        loadResources(); 
         
+        int k = 0;
         for (int i=1; i<15; i++) {
+            switch (i) {
+                case 1: brickColor = "cyan";
+                    break;
+                case 2: brickColor = "blue";
+                    break;
+                case 3: brickColor = "green";
+                    break;
+                case 4: brickColor = "red";
+                    break;
+                case 5: brickColor = "yellow";
+                    break;
+                case 6: brickColor = "cyan";
+                    break;
+                case 7: brickColor = "blue";
+                    break;
+                case 8: brickColor = "green";
+                    break;
+                case 9: brickColor = "red";
+                    break;
+                case 10: brickColor = "yellow";
+                    break;
+                case 11: brickColor = "cyan";
+                    break;
+                case 12: brickColor = "blue";
+                    break;
+                case 13: brickColor = "green";
+                    break;
+                case 14: brickColor = "red";
+                    break;
+                case 15: brickColor = "yellow";
+                    break;
+            }
             for (int j=1; j<15; j++) {
-                elements.add(new Brick("white", j*50+4, i*20+4, false));
+                bricks[k] = new Brick(brickColor, j*50+4, i*20+4, false);
+                k++;
             }
         }
     }
@@ -131,6 +167,29 @@ public class Window extends JPanel implements ActionListener {
                 }
             }
         }
+        for (int q=0; q<196; q++) {
+            if (bricks[q].Destroyed != true) {
+                if (x > bricks[q].x && x < bricks[q].x+100 && y < bricks[q].y && y > bricks[q].y-24) {
+                    bricks[q].Destroyed = true;
+                    if (ballDirectionDown) {
+                        ballDirectionDown = false;
+                        ballDirectionUp = true;
+                    }
+                    if (ballDirectionUp) {
+                        ballDirectionDown = true;
+                        ballDirectionUp = false;
+                    }
+                    if (ballDirectionLeft) {
+                        ballDirectionRight = true;
+                        ballDirectionLeft = false;
+                    }
+                    if (ballDirectionRight) {
+                        ballDirectionRight = false;
+                        ballDirectionLeft = true;
+                    }
+                }
+            }
+        }
     }
     
     // Передвижение ракетки
@@ -188,7 +247,9 @@ public class Window extends JPanel implements ActionListener {
         }
         
         for (int q=0; q<196; q++) {
-            g.drawImage(elements.get(q).img, elements.get(q).x, elements.get(q).y, this);
+            if (bricks[q].Destroyed != true) {
+                g.drawImage(bricks[q].img, bricks[q].x, bricks[q].y, this);
+            }
         }
         
         Toolkit.getDefaultToolkit().sync();
