@@ -1,6 +1,5 @@
 package javanoid;
 
-
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -9,33 +8,40 @@ import javax.swing.Timer;
 import javax.swing.JPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
-public class Window extends JPanel implements ActionListener {
-    private final int WINDOW_WIDTH = 800;
-    private final int WINDOW_HEIGHT = 700;
+public class Window extends JPanel implements ActionListener,MouseListener {
+    private final int WINDOW_WIDTH = 470;
+    private final int WINDOW_HEIGHT = 400;
     private Image imgBoard;
     private Image imgBackground;
     private Image imgBall;
-    private int position = 360;
-    private int x = 399;
-    private int y = 635;
+    private int position = WINDOW_WIDTH/2-50;
+    private int x = WINDOW_WIDTH/2-8;
+    private int y = WINDOW_HEIGHT-65;
     private final int boardStepMove = 2;
     private final int ballStepMove = 1;
-    private final int DELAY = 3;
+    private final int DELAY = 5;
     private Timer timer;
     private boolean leftDirection = false;
     private boolean rightDirection = false;
     private boolean inGame = false;
     private boolean gameOver = false;
+    private boolean levelCompleted = false;
     private String brickColor;
+    private int destroyedBricks;
+    
+    
+    private int numberOfBricks = 30;
     
     private boolean ballDirectionLeft = false;
     private boolean ballDirectionRight = true;
     private boolean ballDirectionUp = true;
     private boolean ballDirectionDown = false;
     
-    private Brick[] bricks = new Brick[196];
+    private Brick[] bricks = new Brick[numberOfBricks];
     
     
     // Загрузка графики и других ресурсов
@@ -53,13 +59,15 @@ public class Window extends JPanel implements ActionListener {
     // Инициализация главного окошка
     public Window() {
         addKeyListener(new MyKeyListener());
+        addMouseListener(new MyMouseListener());
         setBackground(Color.black);
         setFocusable(true);
         setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
         loadResources(); 
         
+        // Расскидываем кубики по доске
         int k = 0;
-        for (int i=1; i<15; i++) {
+        for (int i=1; i<6; i++) { // Кол-во рядов
             switch (i) {
                 case 1: brickColor = "cyan";
                     break;
@@ -92,8 +100,8 @@ public class Window extends JPanel implements ActionListener {
                 case 15: brickColor = "yellow";
                     break;
             }
-            for (int j=1; j<15; j++) {
-                bricks[k] = new Brick(brickColor, j*50+4, i*20+4, false);
+            for (int j=1; j<7; j++) { // Кол-во столбцов
+                bricks[k] = new Brick(brickColor, j*60, i*30, false);
                 k++;
             }
         }
@@ -117,6 +125,16 @@ public class Window extends JPanel implements ActionListener {
         Font small = new Font("Helvetica", Font.BOLD, 24);
         FontMetrics metr = getFontMetrics(small);
 
+        g.setColor(Color.red);
+        g.setFont(small);
+        g.drawString(msg, (WINDOW_WIDTH - metr.stringWidth(msg)) / 2, WINDOW_HEIGHT / 2);
+    }
+    
+    private void victory(Graphics g) {
+        String msg = "Victory";
+        Font small = new Font("Helvetica", Font.BOLD, 24);
+        FontMetrics metr = getFontMetrics(small);
+
         g.setColor(Color.green);
         g.setFont(small);
         g.drawString(msg, (WINDOW_WIDTH - metr.stringWidth(msg)) / 2, WINDOW_HEIGHT / 2);
@@ -128,7 +146,39 @@ public class Window extends JPanel implements ActionListener {
         timer.stop();
     }
     
+    public void levelCompleted() {
+        inGame = false;
+        levelCompleted = true;
+        timer.stop();
+    }
+    
     private void moveBall() {
+        for (int q=0; q<numberOfBricks; q++) {
+            if (bricks[q].Destroyed != true) {
+
+                if (x+8 > bricks[q].x && x+8 < bricks[q].x+46 && y+8 < bricks[q].y+22 && y+8 > bricks[q].y) {
+                    
+                    // Для дебага координат
+                    //System.out.println("br x " + bricks[q].x);
+                    //System.out.println("br y " + bricks[q].y);
+
+                    //System.out.println("ball x " + x);
+                    //System.out.println("ball y " + y);
+                    
+                    bricks[q].Destroyed = true;
+                    if (ballDirectionDown) {
+                        ballDirectionDown = false;
+                        ballDirectionUp = true;
+                    } else {
+                        ballDirectionDown = true;
+                        ballDirectionUp = false;
+                    }
+
+                    break;
+                }
+            }
+        }
+        
         if (ballDirectionRight) {
             if (x < WINDOW_WIDTH-16) {
                 x = x + ballStepMove;
@@ -157,9 +207,9 @@ public class Window extends JPanel implements ActionListener {
             if (y < WINDOW_HEIGHT-66) {
                 y = y + ballStepMove;
             } else {
-                if (x < position) {
+                if (x+8 < position) {
                     stopGame();
-                } else if (x > position+100){
+                } else if (x+8 > position+100){
                     stopGame();
                 } else {
                     ballDirectionUp = true;
@@ -167,27 +217,14 @@ public class Window extends JPanel implements ActionListener {
                 }
             }
         }
-        for (int q=0; q<196; q++) {
-            if (bricks[q].Destroyed != true) {
-                if (x > bricks[q].x && x < bricks[q].x+100 && y < bricks[q].y && y > bricks[q].y-24) {
-                    bricks[q].Destroyed = true;
-                    if (ballDirectionDown) {
-                        ballDirectionDown = false;
-                        ballDirectionUp = true;
-                    }
-                    if (ballDirectionUp) {
-                        ballDirectionDown = true;
-                        ballDirectionUp = false;
-                    }
-                    if (ballDirectionLeft) {
-                        ballDirectionRight = true;
-                        ballDirectionLeft = false;
-                    }
-                    if (ballDirectionRight) {
-                        ballDirectionRight = false;
-                        ballDirectionLeft = true;
-                    }
-                }
+        
+        destroyedBricks=0;
+        for (int j=0; j<numberOfBricks; j++) {
+            if (bricks[j].Destroyed) {
+                destroyedBricks++;
+            }
+            if (destroyedBricks==numberOfBricks) {
+                levelCompleted();
             }
         }
     }
@@ -206,6 +243,43 @@ public class Window extends JPanel implements ActionListener {
             }
         }
     }
+
+    
+    // Разобраться зачем вся эта хрень тут нужна
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    // Для дебага координат
+    private class MyMouseListener extends MouseAdapter {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            int x=e.getX();
+            int y=e.getY();
+            System.out.println("Координаты точки: "+x+","+y);
+        }
+    }
     
     // Прослушка клавиатуры
     private class MyKeyListener extends KeyAdapter {
@@ -221,6 +295,13 @@ public class Window extends JPanel implements ActionListener {
             if (key == KeyEvent.VK_SPACE) {
                 if (inGame != true) {
                     startGame();
+                }
+            }
+            if (key == KeyEvent.VK_PAUSE) {
+                if (timer.isRunning()) {
+                    timer.stop();
+                } else {
+                    timer.start();
                 }
             }
         }
@@ -241,12 +322,12 @@ public class Window extends JPanel implements ActionListener {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.drawImage(imgBackground, 1, 1, this);          
-        g.drawImage(imgBoard, position, 650, this);
+        g.drawImage(imgBoard, position, WINDOW_HEIGHT-50, this);
         if (gameOver != true) {
             g.drawImage(imgBall, x, y, this);
         }
         
-        for (int q=0; q<196; q++) {
+        for (int q=0; q<numberOfBricks; q++) {
             if (bricks[q].Destroyed != true) {
                 g.drawImage(bricks[q].img, bricks[q].x, bricks[q].y, this);
             }
@@ -257,6 +338,9 @@ public class Window extends JPanel implements ActionListener {
         
         if (gameOver) {
             gameOver(g);
+        }
+        if (levelCompleted) {
+            victory(g);
         }
     }
 }

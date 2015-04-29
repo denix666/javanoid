@@ -19,7 +19,7 @@ public class App extends JFrame {
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             
-            //@Override
+            @Override
             public void run() {
                new App().setVisible(true);
             }
