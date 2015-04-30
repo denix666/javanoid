@@ -79,26 +79,6 @@ public class Window extends JPanel implements ActionListener,MouseListener {
                     break;
                 case 5: brickColor = "yellow";
                     break;
-                case 6: brickColor = "cyan";
-                    break;
-                case 7: brickColor = "blue";
-                    break;
-                case 8: brickColor = "green";
-                    break;
-                case 9: brickColor = "red";
-                    break;
-                case 10: brickColor = "yellow";
-                    break;
-                case 11: brickColor = "cyan";
-                    break;
-                case 12: brickColor = "blue";
-                    break;
-                case 13: brickColor = "green";
-                    break;
-                case 14: brickColor = "red";
-                    break;
-                case 15: brickColor = "yellow";
-                    break;
             }
             for (int j=1; j<7; j++) { // Кол-во столбцов
                 bricks[k] = new Brick(brickColor, j*60, i*30, false);
@@ -141,14 +121,14 @@ public class Window extends JPanel implements ActionListener,MouseListener {
     }
     
     public void stopGame() {
-        Sound.play("fall");
+        Sound.play("fall",false);
         inGame = false;
         gameOver = true;
         timer.stop();
     }
     
     public void levelCompleted() {
-        Sound.play("victory");
+        Sound.play("victory",false);
         inGame = false;
         levelCompleted = true;
         timer.stop();
@@ -175,7 +155,7 @@ public class Window extends JPanel implements ActionListener,MouseListener {
                         ballDirectionDown = true;
                         ballDirectionUp = false;
                     }
-                    Sound.play("bum");
+                    Sound.play("bum",false);
                     break;
                 }
             }
@@ -216,7 +196,7 @@ public class Window extends JPanel implements ActionListener,MouseListener {
                 } else {
                     ballDirectionUp = true;
                     ballDirectionDown = false;
-                    Sound.play("click");
+                    Sound.play("click",false);
                 }
             }
         }
