@@ -141,14 +141,14 @@ public class Window extends JPanel implements ActionListener,MouseListener {
     }
     
     public void stopGame() {
-        Sound fall = new Sound("fall");
+        Sound.play("fall");
         inGame = false;
         gameOver = true;
         timer.stop();
     }
     
     public void levelCompleted() {
-        Sound victory = new Sound("victory");
+        Sound.play("victory");
         inGame = false;
         levelCompleted = true;
         timer.stop();
@@ -175,7 +175,7 @@ public class Window extends JPanel implements ActionListener,MouseListener {
                         ballDirectionDown = true;
                         ballDirectionUp = false;
                     }
-                    Sound bum = new Sound("bum");
+                    Sound.play("bum");
                     break;
                 }
             }
@@ -216,7 +216,7 @@ public class Window extends JPanel implements ActionListener,MouseListener {
                 } else {
                     ballDirectionUp = true;
                     ballDirectionDown = false;
-                    Sound click = new Sound("click");
+                    Sound.play("click");
                 }
             }
         }
