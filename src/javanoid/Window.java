@@ -13,8 +13,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 public class Window extends JPanel implements ActionListener,MouseListener {
-    private final int WINDOW_WIDTH = 470;
-    private final int WINDOW_HEIGHT = 400;
+    private final int WINDOW_WIDTH = 700;
+    private final int WINDOW_HEIGHT = 600;
     private Image imgBoard;
     private Image imgBackground;
     private Image imgBall;
@@ -30,11 +30,10 @@ public class Window extends JPanel implements ActionListener,MouseListener {
     private boolean inGame = false;
     private boolean gameOver = false;
     private boolean levelCompleted = false;
-    private String brickColor;
     private int destroyedBricks;
     
     
-    private int numberOfBricks = 30;
+    private final int numberOfBricks = 108;
     
     private boolean ballDirectionLeft = false;
     private boolean ballDirectionRight = true;
@@ -49,7 +48,7 @@ public class Window extends JPanel implements ActionListener,MouseListener {
         ImageIcon img_imgBoard = new ImageIcon(getClass().getResource("resources/paddle.png")); 
         imgBoard = img_imgBoard.getImage();
         
-        ImageIcon img_imgBackground = new ImageIcon(getClass().getResource("resources/bg.jpg")); 
+        ImageIcon img_imgBackground = new ImageIcon(getClass().getResource("resources/bg1.jpg")); 
         imgBackground = img_imgBackground.getImage();
         
         ImageIcon img_imgBall = new ImageIcon(getClass().getResource("resources/ball.png")); 
@@ -63,28 +62,129 @@ public class Window extends JPanel implements ActionListener,MouseListener {
         setBackground(Color.black);
         setFocusable(true);
         setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
-        loadResources(); 
+        loadResources();
+        Level_1();
+    }
+    
+    public void Level_1() {
+        Level Level1 = new Level(1);
         
-        // Расскидываем кубики по доске
         int k = 0;
-        for (int i=1; i<6; i++) { // Кол-во рядов
+        for (int i=1; i<10; i++) { // Кол-во рядов
+            int j = 1;
             switch (i) {
-                case 1: brickColor = "cyan";
-                    break;
-                case 2: brickColor = "blue";
-                    break;
-                case 3: brickColor = "green";
-                    break;
-                case 4: brickColor = "red";
-                    break;
-                case 5: brickColor = "yellow";
-                    break;
-            }
-            for (int j=1; j<7; j++) { // Кол-во столбцов
-                bricks[k] = new Brick(brickColor, j*60, i*30, false);
-                k++;
+                case 1:
+                    for (char ch: Level1.a[0].toCharArray()) {
+                        if ("o".equals(Character.toString(ch))) {
+                            bricks[k] = new Brick("b", j*50, i*20, true);
+                            bricks[k].Destroyed = true;
+                        } else {
+                            bricks[k] = new Brick(Character.toString(ch), j*50, i*20, false);
+                        }
+                        k++;
+                        j++;
+                    }
+                break;
+                case 2:
+                    for (char ch: Level1.b[0].toCharArray()) {
+                        if ("o".equals(Character.toString(ch))) {
+                            bricks[k] = new Brick("b", j*50, i*20, true);
+                            bricks[k].Destroyed = true;
+                        } else {
+                            bricks[k] = new Brick(Character.toString(ch), j*50, i*20, false);
+                        }
+                        k++;
+                        j++;
+                    }
+                break;
+                case 3:
+                    for (char ch: Level1.c[0].toCharArray()) {
+                        if ("o".equals(Character.toString(ch))) {
+                            bricks[k] = new Brick("b", j*50, i*20, true);
+                            bricks[k].Destroyed = true;
+                        } else {
+                            bricks[k] = new Brick(Character.toString(ch), j*50, i*20, false);
+                        }
+                        k++;
+                        j++;
+                    }
+                break;
+                case 4:
+                    for (char ch: Level1.d[0].toCharArray()) {
+                        if ("o".equals(Character.toString(ch))) {
+                            bricks[k] = new Brick("b", j*50, i*20, true);
+                            bricks[k].Destroyed = true;
+                        } else {
+                            bricks[k] = new Brick(Character.toString(ch), j*50, i*20, false);
+                        }
+                        k++;
+                        j++;
+                    }
+                break;
+                case 5:
+                    for (char ch: Level1.e[0].toCharArray()) {
+                        if ("o".equals(Character.toString(ch))) {
+                            bricks[k] = new Brick("b", j*50, i*20, true);
+                            bricks[k].Destroyed = true;
+                        } else {
+                            bricks[k] = new Brick(Character.toString(ch), j*50, i*20, false);
+                        }
+                        k++;
+                        j++;
+                    }
+                break;
+                case 6:
+                    for (char ch: Level1.f[0].toCharArray()) {
+                        if ("o".equals(Character.toString(ch))) {
+                            bricks[k] = new Brick("b", j*50, i*20, true);
+                            bricks[k].Destroyed = true;
+                        } else {
+                            bricks[k] = new Brick(Character.toString(ch), j*50, i*20, false);
+                        }
+                        k++;
+                        j++;
+                    }
+                break;
+                case 7:
+                    for (char ch: Level1.g[0].toCharArray()) {
+                        if ("o".equals(Character.toString(ch))) {
+                            bricks[k] = new Brick("b", j*50, i*20, true);
+                            bricks[k].Destroyed = true;
+                        } else {
+                            bricks[k] = new Brick(Character.toString(ch), j*50, i*20, false);
+                        }
+                        k++;
+                        j++;
+                    }
+                break;
+                case 8:
+                    for (char ch: Level1.h[0].toCharArray()) {
+                        if ("o".equals(Character.toString(ch))) {
+                            bricks[k] = new Brick("b", j*50, i*20, true);
+                            bricks[k].Destroyed = true;
+                        } else {
+                            bricks[k] = new Brick(Character.toString(ch), j*50, i*20, false);
+                        }
+                        k++;
+                        j++;
+                    }
+                break;
+                case 9:
+                    for (char ch: Level1.i[0].toCharArray()) {
+                        if ("o".equals(Character.toString(ch))) {
+                            bricks[k] = new Brick("b", j*50, i*20, true);
+                            bricks[k].Destroyed = true;
+                        } else {
+                            bricks[k] = new Brick(Character.toString(ch), j*50, i*20, false);
+                        }
+                        k++;
+                        j++;
+                    }
+                break;
             }
         }
+        
+        //Sound.play("flute.wav",true);
     }
     
     // Прослушка таймера
@@ -121,14 +221,14 @@ public class Window extends JPanel implements ActionListener,MouseListener {
     }
     
     public void stopGame() {
-        Sound.play("fall",false);
+        Sound.play("fall.au",false);
         inGame = false;
         gameOver = true;
         timer.stop();
     }
     
     public void levelCompleted() {
-        Sound.play("victory",false);
+        Sound.play("victory.au",false);
         inGame = false;
         levelCompleted = true;
         timer.stop();
@@ -155,7 +255,7 @@ public class Window extends JPanel implements ActionListener,MouseListener {
                         ballDirectionDown = true;
                         ballDirectionUp = false;
                     }
-                    Sound.play("bum",false);
+                    Sound.play("bum.au",false);
                     break;
                 }
             }
@@ -196,7 +296,7 @@ public class Window extends JPanel implements ActionListener,MouseListener {
                 } else {
                     ballDirectionUp = true;
                     ballDirectionDown = false;
-                    Sound.play("click",false);
+                    Sound.play("click.au",false);
                 }
             }
         }
