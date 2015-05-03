@@ -17,25 +17,36 @@ public class Level {
         i = new String[numOfLevels];
         
         // Level 1
-        a[0] = "rrrrrrrrrrrr";
-        b[0] = "ryybbyybbyyr";
-        c[0] = "rcoocoocoocr";
-        d[0] = "roppoppoppor";
-        e[0] = "rcoocoocoocr";
-        f[0] = "ryybbyybbyyr";
-        g[0] = "rrrrrrrrrrrr";
-        h[0] = "oooooooooooo";
-        i[0] = "rrrrrrrrrrrr";
+        a[0] = "rrrrrrrrrrrrrrr";
+        b[0] = "bbbbbbbbbbbbbbb";
+        c[0] = "yyyyyyyyyyyyyyy";
+        d[0] = "rrrrrrrrrrrrrrr";
+        e[0] = "ppppppppppppppp";
+        f[0] = "ccccccccccccccc";
+        g[0] = "rrrrrrrrrrrrrrr";
+        h[0] = "yyyyyyyyyyyyyyy";
+        i[0] = "bbbbbbbbbbbbbbb";
         
         // Level 2
-        a[1] = "oooooooooooo";
-        b[1] = "ooppoppoppoo";
-        c[1] = "yyyyyyyyyyyy";
-        d[1] = "gggggggggggg";
-        e[1] = "rrrrrrrrrrrr";
-        f[1] = "oooooooooooo";
-        g[1] = "cccccccccccc";
-        h[0] = "oooooooooooo";
-        i[0] = "rrrrrrrrrrrr";
+        a[1] = "oooooooooooobyy";
+        b[1] = "ooppoppoppoobyy";
+        c[1] = "yyyyyyyyyyyybyy";
+        d[1] = "ggggggggggggbyy";
+        e[1] = "rrrrrrrrrrrrbyy";
+        f[1] = "oooooooooooobyy";
+        g[1] = "ccccccccccccbyy";
+        h[1] = "oooooooooooobyy";
+        i[1] = "rrrrrrrrrrrrbyy";
+        
+        // Level 3
+        a[2] = "ocoocoocoocobyy";
+        b[2] = "ocoocooooocobyy";
+        c[2] = "occccoocoocobyy";
+        d[2] = "ocoocoocoooobyy";
+        e[2] = "ocoocoocoocobyy";
+        f[2] = "oooooooooooobyy";
+        g[2] = "oooooooooooobyy";
+        h[2] = "oooooooooooobyy";
+        i[2] = "oooooooooooobyy";
     }
 }

@@ -11,19 +11,24 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.InputStream;
 
 public class Window extends JPanel implements ActionListener,MouseListener {
-    private final int WINDOW_WIDTH = 700;
-    private final int WINDOW_HEIGHT = 600;
+    private final int WINDOW_WIDTH = 1015;
+    private final int WINDOW_HEIGHT = 650;
+    private final int GAME_AREA_WIDTH = 825;
+    private final int GAME_AREA_HEIGHT = 600;
     private Image imgBoard;
     private Image imgBackground;
     private Image imgBall;
-    private int position = WINDOW_WIDTH/2-50;
-    private int x = WINDOW_WIDTH/2-8;
-    private int y = WINDOW_HEIGHT-65;
-    private final int boardStepMove = 2;
-    private final int ballStepMove = 1;
-    private final int DELAY = 5;
+    private Image imgTable;
+    private int position =  GAME_AREA_WIDTH/2-50;
+    private int x = GAME_AREA_WIDTH/2-8;
+    private int y =  GAME_AREA_HEIGHT-65;
+    private final int boardStepMove = 6;
+    private int ballStepMoveX = 3;
+    private int ballStepMoveY = 3;
+    private final int DELAY = 7;
     private Timer timer;
     private boolean leftDirection = false;
     private boolean rightDirection = false;
@@ -31,17 +36,15 @@ public class Window extends JPanel implements ActionListener,MouseListener {
     private boolean gameOver = false;
     private boolean levelCompleted = false;
     private int destroyedBricks;
-    
-    
-    private final int numberOfBricks = 108;
+
+    private final int numberOfBricks = 135;
     
     private boolean ballDirectionLeft = false;
     private boolean ballDirectionRight = true;
     private boolean ballDirectionUp = true;
     private boolean ballDirectionDown = false;
     
-    private Brick[] bricks = new Brick[numberOfBricks];
-    
+    private final Brick[] bricks = new Brick[numberOfBricks];
     
     // Загрузка графики и других ресурсов
     private void loadResources() {
@@ -53,6 +56,9 @@ public class Window extends JPanel implements ActionListener,MouseListener {
         
         ImageIcon img_imgBall = new ImageIcon(getClass().getResource("resources/ball.png")); 
         imgBall = img_imgBall.getImage();
+        
+        ImageIcon img_imgTable = new ImageIcon(getClass().getResource("resources/ramka.png")); 
+        imgTable = img_imgTable.getImage();
     }
     
     // Инициализация главного окошка
@@ -63,18 +69,18 @@ public class Window extends JPanel implements ActionListener,MouseListener {
         setFocusable(true);
         setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
         loadResources();
-        Level_1();
+        LoadLevel(0);
     }
     
-    public void Level_1() {
-        Level Level1 = new Level(1);
+    public void LoadLevel(int numLevel) {
+        Level NewLevel = new Level(numLevel);
         
         int k = 0;
         for (int i=1; i<10; i++) { // Кол-во рядов
             int j = 1;
             switch (i) {
                 case 1:
-                    for (char ch: Level1.a[0].toCharArray()) {
+                    for (char ch: NewLevel.a[numLevel].toCharArray()) {
                         if ("o".equals(Character.toString(ch))) {
                             bricks[k] = new Brick("b", j*50, i*20, true);
                             bricks[k].Destroyed = true;
@@ -86,7 +92,7 @@ public class Window extends JPanel implements ActionListener,MouseListener {
                     }
                 break;
                 case 2:
-                    for (char ch: Level1.b[0].toCharArray()) {
+                    for (char ch: NewLevel.b[numLevel].toCharArray()) {
                         if ("o".equals(Character.toString(ch))) {
                             bricks[k] = new Brick("b", j*50, i*20, true);
                             bricks[k].Destroyed = true;
@@ -98,7 +104,7 @@ public class Window extends JPanel implements ActionListener,MouseListener {
                     }
                 break;
                 case 3:
-                    for (char ch: Level1.c[0].toCharArray()) {
+                    for (char ch: NewLevel.c[numLevel].toCharArray()) {
                         if ("o".equals(Character.toString(ch))) {
                             bricks[k] = new Brick("b", j*50, i*20, true);
                             bricks[k].Destroyed = true;
@@ -110,7 +116,7 @@ public class Window extends JPanel implements ActionListener,MouseListener {
                     }
                 break;
                 case 4:
-                    for (char ch: Level1.d[0].toCharArray()) {
+                    for (char ch: NewLevel.d[numLevel].toCharArray()) {
                         if ("o".equals(Character.toString(ch))) {
                             bricks[k] = new Brick("b", j*50, i*20, true);
                             bricks[k].Destroyed = true;
@@ -122,7 +128,7 @@ public class Window extends JPanel implements ActionListener,MouseListener {
                     }
                 break;
                 case 5:
-                    for (char ch: Level1.e[0].toCharArray()) {
+                    for (char ch: NewLevel.e[numLevel].toCharArray()) {
                         if ("o".equals(Character.toString(ch))) {
                             bricks[k] = new Brick("b", j*50, i*20, true);
                             bricks[k].Destroyed = true;
@@ -134,7 +140,7 @@ public class Window extends JPanel implements ActionListener,MouseListener {
                     }
                 break;
                 case 6:
-                    for (char ch: Level1.f[0].toCharArray()) {
+                    for (char ch: NewLevel.f[numLevel].toCharArray()) {
                         if ("o".equals(Character.toString(ch))) {
                             bricks[k] = new Brick("b", j*50, i*20, true);
                             bricks[k].Destroyed = true;
@@ -146,7 +152,7 @@ public class Window extends JPanel implements ActionListener,MouseListener {
                     }
                 break;
                 case 7:
-                    for (char ch: Level1.g[0].toCharArray()) {
+                    for (char ch: NewLevel.g[numLevel].toCharArray()) {
                         if ("o".equals(Character.toString(ch))) {
                             bricks[k] = new Brick("b", j*50, i*20, true);
                             bricks[k].Destroyed = true;
@@ -158,7 +164,7 @@ public class Window extends JPanel implements ActionListener,MouseListener {
                     }
                 break;
                 case 8:
-                    for (char ch: Level1.h[0].toCharArray()) {
+                    for (char ch: NewLevel.h[numLevel].toCharArray()) {
                         if ("o".equals(Character.toString(ch))) {
                             bricks[k] = new Brick("b", j*50, i*20, true);
                             bricks[k].Destroyed = true;
@@ -170,7 +176,7 @@ public class Window extends JPanel implements ActionListener,MouseListener {
                     }
                 break;
                 case 9:
-                    for (char ch: Level1.i[0].toCharArray()) {
+                    for (char ch: NewLevel.i[numLevel].toCharArray()) {
                         if ("o".equals(Character.toString(ch))) {
                             bricks[k] = new Brick("b", j*50, i*20, true);
                             bricks[k].Destroyed = true;
@@ -184,7 +190,7 @@ public class Window extends JPanel implements ActionListener,MouseListener {
             }
         }
         
-        //Sound.play("flute.wav",true);
+        Sound.play("flute.wav",true);
     }
     
     // Прослушка таймера
@@ -198,26 +204,6 @@ public class Window extends JPanel implements ActionListener,MouseListener {
         inGame = true;
         timer = new Timer(DELAY, this);
         timer.start();
-    }
-    
-    private void gameOver(Graphics g) {
-        String msg = "Game Over";
-        Font small = new Font("Helvetica", Font.BOLD, 24);
-        FontMetrics metr = getFontMetrics(small);
-
-        g.setColor(Color.red);
-        g.setFont(small);
-        g.drawString(msg, (WINDOW_WIDTH - metr.stringWidth(msg)) / 2, WINDOW_HEIGHT / 2);
-    }
-    
-    private void victory(Graphics g) {
-        String msg = "Victory";
-        Font small = new Font("Helvetica", Font.BOLD, 24);
-        FontMetrics metr = getFontMetrics(small);
-
-        g.setColor(Color.green);
-        g.setFont(small);
-        g.drawString(msg, (WINDOW_WIDTH - metr.stringWidth(msg)) / 2, WINDOW_HEIGHT / 2);
     }
     
     public void stopGame() {
@@ -238,7 +224,7 @@ public class Window extends JPanel implements ActionListener,MouseListener {
         for (int q=0; q<numberOfBricks; q++) {
             if (bricks[q].Destroyed != true) {
 
-                if (x+8 > bricks[q].x && x+8 < bricks[q].x+46 && y+8 < bricks[q].y+22 && y+8 > bricks[q].y) {
+                if (x+8 > bricks[q].x && x+8 < bricks[q].x+50 && y+8 < bricks[q].y+20 && y+8 > bricks[q].y) {
                     
                     // Для дебага координат
                     //System.out.println("br x " + bricks[q].x);
@@ -262,40 +248,60 @@ public class Window extends JPanel implements ActionListener,MouseListener {
         }
         
         if (ballDirectionRight) {
-            if (x < WINDOW_WIDTH-16) {
-                x = x + ballStepMove;
+            if (x < GAME_AREA_WIDTH-16) {
+                x = x + ballStepMoveX;
             } else {
                 ballDirectionLeft = true;
                 ballDirectionRight = false;
             }
         }
         if (ballDirectionLeft) {
-            if (x > 0) {
-                x = x - ballStepMove;
+            if (x > 15) {
+                x = x - ballStepMoveX;
             } else {
                 ballDirectionLeft = false;
                 ballDirectionRight = true;
             }
         }
         if (ballDirectionUp) {
-            if (y > 0) {
-                y = y - ballStepMove;
+            if (y > 7) {
+                y = y - ballStepMoveY;
             } else {
                 ballDirectionUp = false;
                 ballDirectionDown = true;
             }
         }
         if (ballDirectionDown) {
-            if (y < WINDOW_HEIGHT-66) {
-                y = y + ballStepMove;
+            if (y < GAME_AREA_HEIGHT-66) {
+                y = y + ballStepMoveY;
             } else {
-                if (x+8 < position) {
+                if (x+16 < position) {
                     stopGame();
                 } else if (x+8 > position+100){
                     stopGame();
                 } else {
                     ballDirectionUp = true;
                     ballDirectionDown = false;
+                    if (x+8 > position+75 && x+8 < position+100) {
+                        ballStepMoveY = 2;
+                        ballDirectionLeft = false;
+                        ballDirectionRight = true;
+                    }
+                    if (x+8 > position+50 && x+8 < position+75) {
+                        ballStepMoveY = 3;
+                        ballDirectionLeft = false;
+                        ballDirectionRight = true;
+                    }
+                    if (x+8 > position+1 && x+8 < position+25) {
+                        ballStepMoveY = 2;
+                        ballDirectionLeft = true;
+                        ballDirectionRight = false;
+                    }
+                    if (x+8 > position+25 && x+8 < position+50) {
+                        ballStepMoveY = 3;
+                        ballDirectionLeft = true;
+                        ballDirectionRight = false;
+                    }
                     Sound.play("click.au",false);
                 }
             }
@@ -315,13 +321,13 @@ public class Window extends JPanel implements ActionListener,MouseListener {
     // Передвижение ракетки
     private void moveBoard() {
         if (leftDirection) {
-            if (position > 0) {
+            if (position > 15) {
                 position = position - boardStepMove;
             }
         }
 
         if (rightDirection) {
-            if (position < WINDOW_WIDTH-100) {
+            if (position < GAME_AREA_WIDTH-100) {
                 position = position + boardStepMove;
             }
         }
@@ -400,12 +406,27 @@ public class Window extends JPanel implements ActionListener,MouseListener {
         }
     }
     
+    private void writeMessage(Graphics g, int x, int y, String msg) {
+        try {
+            InputStream fntStream = getClass().getResourceAsStream("resources/iomanoid.ttf");
+            Font fontRaw = Font.createFont(Font.TRUETYPE_FONT, fntStream);
+            Font Iomanoid = fontRaw.deriveFont(45f);
+
+            g.setColor(Color.black);
+            g.setFont(Iomanoid);
+            g.drawString(msg, x,y);
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+    }
+    
     // Отрисовка графических обьектов
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(imgBackground, 1, 1, this);          
-        g.drawImage(imgBoard, position, WINDOW_HEIGHT-50, this);
+        g.drawImage(imgBackground, 1, 1, this); 
+        g.drawImage(imgTable, 1, 1, this);
+        g.drawImage(imgBoard, position, GAME_AREA_HEIGHT-50, this);
         if (gameOver != true) {
             g.drawImage(imgBall, x, y, this);
         }
@@ -420,10 +441,11 @@ public class Window extends JPanel implements ActionListener,MouseListener {
         repaint();
         
         if (gameOver) {
-            gameOver(g);
+            writeMessage(g, 340,GAME_AREA_HEIGHT/2,"GAME OVER");
         }
         if (levelCompleted) {
-            victory(g);
+            writeMessage(g, 320,GAME_AREA_HEIGHT/2,"V I C T O R Y");
         }
+        writeMessage(g, 845,50,"Level - 1");
     }
 }
