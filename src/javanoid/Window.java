@@ -1,80 +1,285 @@
 package javanoid;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.*;
-import javax.swing.Timer;
-import javax.swing.JPanel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.InputStream;
+import static javax.swing.JFrame.EXIT_ON_CLOSE;
 
-public class Window extends JPanel implements ActionListener,MouseListener {
-    private final int WINDOW_WIDTH = 1015;
-    private final int WINDOW_HEIGHT = 650;
-    private final int GAME_AREA_WIDTH = 825;
-    private final int GAME_AREA_HEIGHT = 600;
-    private Image imgBoard;
-    private Image imgBackground;
-    private Image imgBall;
-    private Image imgTable;
-    private int position =  GAME_AREA_WIDTH/2-50;
-    private int x = GAME_AREA_WIDTH/2-8;
-    private int y =  GAME_AREA_HEIGHT-65;
-    private final int boardStepMove = 6;
+public class Window extends JPanel implements ActionListener {
+    // Paddle
+    private static boolean paddleDirectionLeft, paddleDirectionRight;
+    private static int paddlePosition = Main.GAME_AREA_WIDTH/2-50;
+    private final int paddleStepMove = 5;
+    
+    // Ball
     private int ballStepMoveX = 3;
     private int ballStepMoveY = 3;
-    private final int DELAY = 7;
-    private Timer timer;
-    private boolean leftDirection = false;
-    private boolean rightDirection = false;
-    private boolean inGame = false;
-    private boolean gameOver = false;
-    private boolean levelCompleted = false;
-    private int destroyedBricks;
-
-    private final int numberOfBricks = 135;
-    
     private boolean ballDirectionLeft = false;
     private boolean ballDirectionRight = true;
     private boolean ballDirectionUp = true;
     private boolean ballDirectionDown = false;
+    private int ballPosX = Main.GAME_AREA_WIDTH/2-8;
+    private int ballPosY =  Main.GAME_AREA_HEIGHT-65;
     
+    // Bricks
+    private int destroyedBricks;
+    private static final int numberOfBricks = 135;
     private final Brick[] bricks = new Brick[numberOfBricks];
     
-    // Загрузка графики и других ресурсов
-    private void loadResources() {
-        ImageIcon img_imgBoard = new ImageIcon(getClass().getResource("resources/paddle.png")); 
-        imgBoard = img_imgBoard.getImage();
-        
-        ImageIcon img_imgBackground = new ImageIcon(getClass().getResource("resources/bg1.jpg")); 
-        imgBackground = img_imgBackground.getImage();
-        
-        ImageIcon img_imgBall = new ImageIcon(getClass().getResource("resources/ball.png")); 
-        imgBall = img_imgBall.getImage();
-        
-        ImageIcon img_imgTable = new ImageIcon(getClass().getResource("resources/ramka.png")); 
-        imgTable = img_imgTable.getImage();
+    // Other vars
+    private static boolean gameRunning;
+    private static final int DELAY = 7;
+    
+    // Objects
+    Img background = new Img("backgrounds/bg"+Main.curLevel+".jpg");
+    JFrame frame = new JFrame();
+    Img paddle = new Img("paddle.png");
+    Img ball = new Img("ball.png");
+    Img ramka = new Img("ramka.png");
+    Timer timer = new Timer(DELAY, this);
+    Level level = new Level(Main.curLevel);
+    Sound sound = new Sound();
+    Music music = new Music("intro.wav");
+    Pause pause = new Pause();
+    
+    public Window(String winTitle, int winWidth, int winHeight) {
+        loadLevel(Main.curLevel); // Это будет начало уровня
+        //music.loop();
+        frame.addKeyListener(new MyKeyListener());
+        frame.add(this);
+        frame.setTitle(winTitle);
+        frame.setSize(winWidth,winHeight);
+        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+        frame.setResizable(false);
+        frame.setVisible(true);
+        levelStart();
     }
     
-    // Инициализация главного окошка
-    public Window() {
-        addKeyListener(new MyKeyListener());
-        addMouseListener(new MyMouseListener());
-        setBackground(Color.black);
-        setFocusable(true);
-        setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
-        loadResources();
-        LoadLevel(0);
+    // Передвижение ракетки
+    public void movePaddle() {
+        if (paddleDirectionLeft) {
+            if (paddlePosition > 15) {
+                paddlePosition = paddlePosition - paddleStepMove;
+            }
+        }
+
+        if (paddleDirectionRight) {
+            if (paddlePosition < Main.GAME_AREA_WIDTH-100) {
+                paddlePosition = paddlePosition + paddleStepMove;
+            }
+        }
     }
     
-    public void LoadLevel(int numLevel) {
+    public void levelCompleted() {
+        gameRunning = false;
+        timer.stop();
+        music.stop();
+        sound.play("level_completed.wav");
+        pause.wait(5000);
+        if (Main.curLevel < Main.numOfLevels) {
+            Main.curLevel++;
+            this.background = new Img("backgrounds/bg"+Main.curLevel+".jpg");
+            //this.music = new Music("level"+Main.curLevel+".wav");
+            //this.music = new Music("intro.wav");
+            frame.setTitle("Level - "+Main.curLevel+" | Lives - "+Main.numOfLives+" | Score - "+Main.score);
+            loadLevel(Main.curLevel);
+            levelStart();
+        } else {
+            // Victory
+            sound.play("game_completed.wav");
+            pause.wait(5000);
+            System.exit(0);
+        }
+    }
+    
+    public void levelFail() {
+        timer.stop();
+        music.stop();
+        sound.play("ball_lost.wav");
+        pause.wait(500);
+        sound.play("level_fail.wav");
+        pause.wait(3000);
+        gameRunning = false;
+        if (Main.numOfLives > 0) {
+            Main.numOfLives--;
+            levelStart();
+        } else {
+            // Mission failure
+            sound.play("game_over.wav");
+            pause.wait(3000);
+            System.exit(0);
+        }
+    }
+    
+    public void levelStart() {
+        frame.setTitle("Level - "+Main.curLevel+" | Lives - "+Main.numOfLives+" | Score - "+Main.score);
+        gameRunning = true;
+        paddlePosition = Main.GAME_AREA_WIDTH/2-50;
+        ballPosX = Main.GAME_AREA_WIDTH/2-8;
+        ballPosY =  Main.GAME_AREA_HEIGHT-65;
+        //music.stop();
+        sound.play("level_start.wav");
+        //music.play();
+    }
+    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        movePaddle();
+        moveBall();
+    }
+    
+    // Прослушка клавиатуры
+    private class MyKeyListener extends KeyAdapter {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            int key = e.getKeyCode();
+            if (key == KeyEvent.VK_LEFT) {
+                paddleDirectionLeft = true;
+            }
+            if (key == KeyEvent.VK_RIGHT) {
+                paddleDirectionRight = true;
+            }
+            if (key == KeyEvent.VK_SPACE) {
+                if (!gameRunning) {
+                    levelStart();
+                    timer.start();
+                } else {
+                    timer.start();
+                }
+            }
+            if (key == KeyEvent.VK_PAUSE) {
+                timer.stop();
+            }
+            
+        }
+        @Override
+        public void keyReleased(KeyEvent e) {
+            int key = e.getKeyCode();
+            if (key == KeyEvent.VK_LEFT) {
+                paddleDirectionLeft = false;
+            }
+            if (key == KeyEvent.VK_RIGHT) {
+                paddleDirectionRight = false;
+            }
+        }
+    }
+    
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(background.img, 0, 0, this);
+        g.drawImage(ramka.img, 0, 0, this);
+        g.drawImage(paddle.img, paddlePosition, Main.GAME_AREA_HEIGHT-50, this);
+        g.drawImage(ball.img, ballPosX, ballPosY, this);
+        
+        for (int q=0; q<numberOfBricks; q++) {
+            if (bricks[q].Destroyed != true) {
+                g.drawImage(bricks[q].img, bricks[q].x, bricks[q].y, this);
+            }
+        }
+ 
+        repaint();
+    }
+    
+    private void moveBall() {
+        for (int q=0; q<numberOfBricks; q++) {
+            if (bricks[q].Destroyed != true) {
+                if (ballPosX+8 > bricks[q].x && ballPosX+8 < bricks[q].x+50 && ballPosY+8 < bricks[q].y+20 && ballPosY+8 > bricks[q].y) {
+                    bricks[q].Destroyed = true;
+                    sound.play("destroyed_block.au");
+                    
+                    Main.score = Main.score + 25;
+                    frame.setTitle("Level - "+Main.curLevel+" | Lives - "+Main.numOfLives+" | Score - "+Main.score);
+                    if (ballDirectionDown) {
+                        ballDirectionDown = false;
+                        ballDirectionUp = true;
+                    } else {
+                        ballDirectionDown = true;
+                        ballDirectionUp = false;
+                    }
+                    break;
+                }
+            }
+        }
+        
+        if (ballDirectionRight) {
+            if (ballPosX < Main.GAME_AREA_WIDTH-16) {
+                ballPosX = ballPosX + ballStepMoveX;
+            } else {
+                ballDirectionLeft = true;
+                ballDirectionRight = false;
+            }
+        }
+        if (ballDirectionLeft) {
+            if (ballPosX > 15) {
+                ballPosX = ballPosX - ballStepMoveX;
+            } else {
+                ballDirectionLeft = false;
+                ballDirectionRight = true;
+            }
+        }
+        if (ballDirectionUp) {
+            if (ballPosY > 7) {
+                ballPosY = ballPosY - ballStepMoveY;
+            } else {
+                ballDirectionUp = false;
+                ballDirectionDown = true;
+            }
+        }
+        if (ballDirectionDown) {
+            if (ballPosY < Main.GAME_AREA_HEIGHT-66) {
+                ballPosY = ballPosY + ballStepMoveY;
+            } else {
+                if (ballPosX+16 < paddlePosition) {
+                    levelFail();
+                } else if (ballPosX+8 > paddlePosition+100){
+                    levelFail();
+                } else {
+                    ballDirectionUp = true;
+                    ballDirectionDown = false;
+                    if (ballPosX+8 > paddlePosition+75 && ballPosX+8 < paddlePosition+100) {
+                        ballStepMoveY = 2;
+                        ballDirectionLeft = false;
+                        ballDirectionRight = true;
+                    }
+                    if (ballPosX+8 > paddlePosition+50 && ballPosX+8 < paddlePosition+75) {
+                        ballStepMoveY = 3;
+                        ballDirectionLeft = false;
+                        ballDirectionRight = true;
+                    }
+                    if (ballPosX+8 > paddlePosition+1 && ballPosX+8 < paddlePosition+25) {
+                        ballStepMoveY = 2;
+                        ballDirectionLeft = true;
+                        ballDirectionRight = false;
+                    }
+                    if (ballPosX+8 > paddlePosition+25 && ballPosX+8 < paddlePosition+50) {
+                        ballStepMoveY = 3;
+                        ballDirectionLeft = true;
+                        ballDirectionRight = false;
+                    }
+                    sound.play("paddle_click.au");
+                }
+            }
+        }
+        
+        destroyedBricks=0;
+        for (int j=0; j<numberOfBricks; j++) {
+            if (bricks[j].Destroyed) {
+                destroyedBricks++;
+            }
+            if (destroyedBricks==numberOfBricks) {
+                levelCompleted();
+            }
+        }
+    }
+    
+    public void loadLevel(int numLevel) {
         Level NewLevel = new Level(numLevel);
-        
+
         int k = 0;
         for (int i=1; i<10; i++) { // Кол-во рядов
             int j = 1;
@@ -189,263 +394,5 @@ public class Window extends JPanel implements ActionListener,MouseListener {
                 break;
             }
         }
-        
-        Sound.play("flute.wav",true);
-    }
-    
-    // Прослушка таймера
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        moveBoard();
-        moveBall();
-    }
-    
-    public void startGame() {
-        inGame = true;
-        timer = new Timer(DELAY, this);
-        timer.start();
-    }
-    
-    public void stopGame() {
-        Sound.play("fall.au",false);
-        inGame = false;
-        gameOver = true;
-        timer.stop();
-    }
-    
-    public void levelCompleted() {
-        Sound.play("victory.au",false);
-        inGame = false;
-        levelCompleted = true;
-        timer.stop();
-    }
-    
-    private void moveBall() {
-        for (int q=0; q<numberOfBricks; q++) {
-            if (bricks[q].Destroyed != true) {
-
-                if (x+8 > bricks[q].x && x+8 < bricks[q].x+50 && y+8 < bricks[q].y+20 && y+8 > bricks[q].y) {
-                    
-                    // Для дебага координат
-                    //System.out.println("br x " + bricks[q].x);
-                    //System.out.println("br y " + bricks[q].y);
-
-                    //System.out.println("ball x " + x);
-                    //System.out.println("ball y " + y);
-                    
-                    bricks[q].Destroyed = true;
-                    if (ballDirectionDown) {
-                        ballDirectionDown = false;
-                        ballDirectionUp = true;
-                    } else {
-                        ballDirectionDown = true;
-                        ballDirectionUp = false;
-                    }
-                    Sound.play("bum.au",false);
-                    break;
-                }
-            }
-        }
-        
-        if (ballDirectionRight) {
-            if (x < GAME_AREA_WIDTH-16) {
-                x = x + ballStepMoveX;
-            } else {
-                ballDirectionLeft = true;
-                ballDirectionRight = false;
-            }
-        }
-        if (ballDirectionLeft) {
-            if (x > 15) {
-                x = x - ballStepMoveX;
-            } else {
-                ballDirectionLeft = false;
-                ballDirectionRight = true;
-            }
-        }
-        if (ballDirectionUp) {
-            if (y > 7) {
-                y = y - ballStepMoveY;
-            } else {
-                ballDirectionUp = false;
-                ballDirectionDown = true;
-            }
-        }
-        if (ballDirectionDown) {
-            if (y < GAME_AREA_HEIGHT-66) {
-                y = y + ballStepMoveY;
-            } else {
-                if (x+16 < position) {
-                    stopGame();
-                } else if (x+8 > position+100){
-                    stopGame();
-                } else {
-                    ballDirectionUp = true;
-                    ballDirectionDown = false;
-                    if (x+8 > position+75 && x+8 < position+100) {
-                        ballStepMoveY = 2;
-                        ballDirectionLeft = false;
-                        ballDirectionRight = true;
-                    }
-                    if (x+8 > position+50 && x+8 < position+75) {
-                        ballStepMoveY = 3;
-                        ballDirectionLeft = false;
-                        ballDirectionRight = true;
-                    }
-                    if (x+8 > position+1 && x+8 < position+25) {
-                        ballStepMoveY = 2;
-                        ballDirectionLeft = true;
-                        ballDirectionRight = false;
-                    }
-                    if (x+8 > position+25 && x+8 < position+50) {
-                        ballStepMoveY = 3;
-                        ballDirectionLeft = true;
-                        ballDirectionRight = false;
-                    }
-                    Sound.play("click.au",false);
-                }
-            }
-        }
-        
-        destroyedBricks=0;
-        for (int j=0; j<numberOfBricks; j++) {
-            if (bricks[j].Destroyed) {
-                destroyedBricks++;
-            }
-            if (destroyedBricks==numberOfBricks) {
-                levelCompleted();
-            }
-        }
-    }
-    
-    // Передвижение ракетки
-    private void moveBoard() {
-        if (leftDirection) {
-            if (position > 15) {
-                position = position - boardStepMove;
-            }
-        }
-
-        if (rightDirection) {
-            if (position < GAME_AREA_WIDTH-100) {
-                position = position + boardStepMove;
-            }
-        }
-    }
-
-    
-    // Разобраться зачем вся эта хрень тут нужна
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    // Для дебага координат
-    private class MyMouseListener extends MouseAdapter {
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            int x=e.getX();
-            int y=e.getY();
-            System.out.println("Координаты точки: "+x+","+y);
-        }
-    }
-    
-    // Прослушка клавиатуры
-    private class MyKeyListener extends KeyAdapter {
-        @Override
-        public void keyPressed(KeyEvent e) {
-            int key = e.getKeyCode();
-            if (key == KeyEvent.VK_LEFT) {
-                leftDirection = true;
-            }
-            if (key == KeyEvent.VK_RIGHT) {
-                rightDirection = true;
-            }
-            if (key == KeyEvent.VK_SPACE) {
-                if (inGame != true) {
-                    startGame();
-                }
-            }
-            if (key == KeyEvent.VK_PAUSE) {
-                if (timer.isRunning()) {
-                    timer.stop();
-                } else {
-                    timer.start();
-                }
-            }
-        }
-        @Override
-        public void keyReleased(KeyEvent e) {
-            int key = e.getKeyCode();
-            if (key == KeyEvent.VK_LEFT) {
-                leftDirection = false;
-            }
-            if (key == KeyEvent.VK_RIGHT) {
-                rightDirection = false;
-            }
-        }
-    }
-    
-    private void writeMessage(Graphics g, int x, int y, String msg) {
-        try {
-            InputStream fntStream = getClass().getResourceAsStream("resources/iomanoid.ttf");
-            Font fontRaw = Font.createFont(Font.TRUETYPE_FONT, fntStream);
-            Font Iomanoid = fontRaw.deriveFont(45f);
-
-            g.setColor(Color.black);
-            g.setFont(Iomanoid);
-            g.drawString(msg, x,y);
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
-    }
-    
-    // Отрисовка графических обьектов
-    @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        g.drawImage(imgBackground, 1, 1, this); 
-        g.drawImage(imgTable, 1, 1, this);
-        g.drawImage(imgBoard, position, GAME_AREA_HEIGHT-50, this);
-        if (gameOver != true) {
-            g.drawImage(imgBall, x, y, this);
-        }
-        
-        for (int q=0; q<numberOfBricks; q++) {
-            if (bricks[q].Destroyed != true) {
-                g.drawImage(bricks[q].img, bricks[q].x, bricks[q].y, this);
-            }
-        }
-        
-        Toolkit.getDefaultToolkit().sync();
-        repaint();
-        
-        if (gameOver) {
-            writeMessage(g, 340,GAME_AREA_HEIGHT/2,"GAME OVER");
-        }
-        if (levelCompleted) {
-            writeMessage(g, 320,GAME_AREA_HEIGHT/2,"V I C T O R Y");
-        }
-        writeMessage(g, 845,50,"Level - 1");
     }
 }
