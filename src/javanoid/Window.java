@@ -5,10 +5,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
 import javax.swing.*;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 
-public class Window extends JPanel implements ActionListener {
+public class Window extends JPanel implements ActionListener,MouseMotionListener {
     // Paddle
     private static boolean paddleDirectionLeft, paddleDirectionRight;
     private static int paddlePosition = Main.GAME_AREA_WIDTH/2-50;
@@ -23,6 +26,7 @@ public class Window extends JPanel implements ActionListener {
     private boolean ballDirectionDown = false;
     private int ballPosX = Main.GAME_AREA_WIDTH/2-8;
     private int ballPosY =  Main.GAME_AREA_HEIGHT-65;
+    private int calcBallPosX, calcBallPosY;
     
     // Bricks
     private int destroyedBricks;
@@ -46,9 +50,19 @@ public class Window extends JPanel implements ActionListener {
     Pause pause = new Pause();
     
     public Window(String winTitle, int winWidth, int winHeight) {
-        loadLevel(Main.curLevel); // Это будет начало уровня
+        // Загрузка первого уровня
+        loadLevel(Main.curLevel);
+        
         //music.loop();
+        
         frame.addKeyListener(new MyKeyListener());
+        frame.addMouseMotionListener(this);
+        
+        // Make invisible mouse cursor
+        BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
+        frame.getContentPane().setCursor(blankCursor);
+        
         frame.add(this);
         frame.setTitle(winTitle);
         frame.setSize(winWidth,winHeight);
@@ -56,6 +70,7 @@ public class Window extends JPanel implements ActionListener {
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setVisible(true);
+
         levelStart();
     }
     
@@ -168,6 +183,22 @@ public class Window extends JPanel implements ActionListener {
         }
     }
     
+    // Прослушка мышки
+    @Override
+    public void mouseDragged(MouseEvent e) {}
+    
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        paddlePosition = e.getX();
+        if (paddlePosition < 15) {
+            paddlePosition = 15;
+        }
+        
+        if (paddlePosition > Main.GAME_AREA_WIDTH-100) {
+            paddlePosition =Main.GAME_AREA_WIDTH-100;
+        }
+    }
+    
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -188,7 +219,19 @@ public class Window extends JPanel implements ActionListener {
     private void moveBall() {
         for (int q=0; q<numberOfBricks; q++) {
             if (bricks[q].Destroyed != true) {
-                if (ballPosX+8 > bricks[q].x && ballPosX+8 < bricks[q].x+50 && ballPosY+8 < bricks[q].y+20 && ballPosY+8 > bricks[q].y) {
+                if (ballDirectionRight) {
+                    calcBallPosX = ballPosX+14;
+                } else {
+                    calcBallPosX = ballPosX+2;
+                }
+                if (ballDirectionUp) {
+                    calcBallPosY = ballPosY+2;
+                } else {
+                    calcBallPosY = ballPosY+14;
+                }
+                
+                
+                if (calcBallPosX > bricks[q].x && calcBallPosX < bricks[q].x+50 && calcBallPosY < bricks[q].y+20 && calcBallPosY > bricks[q].y) {
                     bricks[q].Destroyed = true;
                     sound.play("destroyed_block.au");
                     
@@ -234,29 +277,29 @@ public class Window extends JPanel implements ActionListener {
             if (ballPosY < Main.GAME_AREA_HEIGHT-66) {
                 ballPosY = ballPosY + ballStepMoveY;
             } else {
-                if (ballPosX+16 < paddlePosition) {
+                if (calcBallPosX < paddlePosition) {
                     levelFail();
-                } else if (ballPosX+8 > paddlePosition+100){
+                } else if (calcBallPosX > paddlePosition+100){
                     levelFail();
                 } else {
                     ballDirectionUp = true;
                     ballDirectionDown = false;
-                    if (ballPosX+8 > paddlePosition+75 && ballPosX+8 < paddlePosition+100) {
+                    if (calcBallPosX > paddlePosition+75 && calcBallPosX < paddlePosition+100) {
                         ballStepMoveY = 2;
                         ballDirectionLeft = false;
                         ballDirectionRight = true;
                     }
-                    if (ballPosX+8 > paddlePosition+50 && ballPosX+8 < paddlePosition+75) {
+                    if (calcBallPosX > paddlePosition+50 && calcBallPosX < paddlePosition+75) {
                         ballStepMoveY = 3;
                         ballDirectionLeft = false;
                         ballDirectionRight = true;
                     }
-                    if (ballPosX+8 > paddlePosition+1 && ballPosX+8 < paddlePosition+25) {
+                    if (calcBallPosX > paddlePosition && calcBallPosX < paddlePosition+25) {
                         ballStepMoveY = 2;
                         ballDirectionLeft = true;
                         ballDirectionRight = false;
                     }
-                    if (ballPosX+8 > paddlePosition+25 && ballPosX+8 < paddlePosition+50) {
+                    if (calcBallPosX > paddlePosition+25 && calcBallPosX < paddlePosition+50) {
                         ballStepMoveY = 3;
                         ballDirectionLeft = true;
                         ballDirectionRight = false;
