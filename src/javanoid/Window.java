@@ -42,7 +42,7 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
     JFrame frame = new JFrame();
     Img paddle = new Img("paddle.png");
     Img ball = new Img("ball.png");
-    Img ramka = new Img("ramka.png");
+    Img ramka = new Img("frame.png");
     Timer timer = new Timer(DELAY, this);
     Level level = new Level(Main.curLevel);
     Sound sound = new Sound();
@@ -258,7 +258,7 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
             }
         }
         if (ballDirectionLeft) {
-            if (ballPosX > 15) {
+            if (ballPosX > 10) {
                 ballPosX = ballPosX - ballStepMoveX;
             } else {
                 ballDirectionLeft = false;

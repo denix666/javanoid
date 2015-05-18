@@ -7,11 +7,11 @@ package javanoid;
 
 public class Main {
 
-    public static final int GAME_WINDOW_WIDTH = 1020;
-    public static final int GAME_WINDOW_HEIGHT = 660;
+    public static final int GAME_WINDOW_WIDTH = 805;
+    public static final int GAME_WINDOW_HEIGHT = 630;
     
-    public static final int GAME_AREA_WIDTH = 825;
-    public static final int GAME_AREA_HEIGHT = 600;
+    public static final int GAME_AREA_WIDTH = 790;
+    public static final int GAME_AREA_HEIGHT = 620;
     
     public static int curLevel = 1;
     public static int numOfLevels = 5;
