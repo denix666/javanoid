@@ -6,12 +6,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 
-public class Window extends JPanel implements ActionListener,MouseMotionListener {
+public class Window extends JPanel implements ActionListener,MouseMotionListener,MouseListener {
     // Paddle
     private static boolean paddleDirectionLeft, paddleDirectionRight;
     private static int paddlePosition = Main.GAME_AREA_WIDTH/2-50;
@@ -30,19 +31,24 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
     
     // Bricks
     private int destroyedBricks;
-    private static final int numberOfBricks = 135;
+    private static final int numberOfBricks = 126;
     private final Brick[] bricks = new Brick[numberOfBricks];
     
     // Other vars
     private static boolean gameRunning;
     private static final int DELAY = 7;
+    private static boolean showingIntro = true;
+    private static boolean showingGameOver = false;
     
     // Objects
     Img background = new Img("backgrounds/bg"+Main.curLevel+".jpg");
     JFrame frame = new JFrame();
     Img paddle = new Img("paddle.png");
     Img ball = new Img("ball.png");
+    Img intro = new Img("intro.jpg");
+    Img gameOver = new Img("game_over.jpg");
     Img ramka = new Img("frame.png");
+    Img icon = new Img("icon.png");
     Timer timer = new Timer(DELAY, this);
     Level level = new Level(Main.curLevel);
     Sound sound = new Sound();
@@ -53,10 +59,11 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
         // Загрузка первого уровня
         loadLevel(Main.curLevel);
         
-        //music.loop();
+        music.loop();
         
         frame.addKeyListener(new MyKeyListener());
         frame.addMouseMotionListener(this);
+        frame.addMouseListener(this);
         
         // Make invisible mouse cursor
         BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
@@ -64,6 +71,7 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
         frame.getContentPane().setCursor(blankCursor);
         
         frame.add(this);
+        frame.setIconImage(icon.img);
         frame.setTitle(winTitle);
         frame.setSize(winWidth,winHeight);
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -92,14 +100,11 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
     public void levelCompleted() {
         gameRunning = false;
         timer.stop();
-        music.stop();
         sound.play("level_completed.wav");
         pause.wait(5000);
         if (Main.curLevel < Main.numOfLevels) {
             Main.curLevel++;
             this.background = new Img("backgrounds/bg"+Main.curLevel+".jpg");
-            //this.music = new Music("level"+Main.curLevel+".wav");
-            //this.music = new Music("intro.wav");
             frame.setTitle("Level - "+Main.curLevel+" | Lives - "+Main.numOfLives+" | Score - "+Main.score);
             loadLevel(Main.curLevel);
             levelStart();
@@ -121,32 +126,37 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
         gameRunning = false;
         if (Main.numOfLives > 0) {
             Main.numOfLives--;
+            ballDirectionUp = true;
+            ballDirectionDown = false;
             levelStart();
         } else {
             // Mission failure
+            showingGameOver = true;
             sound.play("game_over.wav");
-            pause.wait(3000);
-            System.exit(0);
         }
     }
     
     public void levelStart() {
+        if (showingGameOver) {
+            System.exit(0);
+        }
         frame.setTitle("Level - "+Main.curLevel+" | Lives - "+Main.numOfLives+" | Score - "+Main.score);
         gameRunning = true;
         paddlePosition = Main.GAME_AREA_WIDTH/2-50;
         ballPosX = Main.GAME_AREA_WIDTH/2-8;
         ballPosY =  Main.GAME_AREA_HEIGHT-65;
-        //music.stop();
-        sound.play("level_start.wav");
-        //music.play();
+        if (!showingIntro) {
+            sound.play("level_start.wav");
+        }
     }
     
+    // Прослушка таймера
     @Override
     public void actionPerformed(ActionEvent e) {
         movePaddle();
         moveBall();
     }
-    
+
     // Прослушка клавиатуры
     private class MyKeyListener extends KeyAdapter {
         @Override
@@ -159,11 +169,17 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
                 paddleDirectionRight = true;
             }
             if (key == KeyEvent.VK_SPACE) {
-                if (!gameRunning) {
-                    levelStart();
-                    timer.start();
+                if (showingIntro) {
+                    showingIntro = false;
+                    music.stop();
+                    sound.play("level_start.wav");
                 } else {
-                    timer.start();
+                    if (!gameRunning) {
+                        levelStart();
+                        timer.start();
+                    } else {
+                        timer.start();
+                    }
                 }
             }
             if (key == KeyEvent.VK_PAUSE) {
@@ -188,6 +204,34 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
     public void mouseDragged(MouseEvent e) {}
     
     @Override
+    public void mousePressed(MouseEvent e) {}
+
+    @Override
+    public void mouseReleased(MouseEvent e) {}
+
+    @Override
+    public void mouseEntered(MouseEvent e) {}
+
+    @Override
+    public void mouseExited(MouseEvent e) {}
+    
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (showingIntro) {
+            showingIntro = false;
+            music.stop();
+            sound.play("level_start.wav");
+        } else {
+            if (!gameRunning) {
+                levelStart();
+                timer.start();
+            } else {
+                timer.start();
+            }
+        }
+    }
+    
+    @Override
     public void mouseMoved(MouseEvent e) {
         paddlePosition = e.getX();
         if (paddlePosition < 15) {
@@ -197,11 +241,18 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
         if (paddlePosition > Main.GAME_AREA_WIDTH-100) {
             paddlePosition =Main.GAME_AREA_WIDTH-100;
         }
+        
+        if (!timer.isRunning()) {
+            ballPosX = paddlePosition+42;
+        }
     }
     
+    
+    // Отрисовка компонентов
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        
         g.drawImage(background.img, 0, 0, this);
         g.drawImage(ramka.img, 0, 0, this);
         g.drawImage(paddle.img, paddlePosition, Main.GAME_AREA_HEIGHT-50, this);
@@ -212,10 +263,19 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
                 g.drawImage(bricks[q].img, bricks[q].x, bricks[q].y, this);
             }
         }
- 
+        
+        if (showingIntro) {
+            g.drawImage(intro.img, 0, 0, this);
+        }
+        
+        if (showingGameOver) {
+            g.drawImage(gameOver.img, 0, 0, this);
+        }
+        
         repaint();
     }
     
+    // Движение мячика
     private void moveBall() {
         for (int q=0; q<numberOfBricks; q++) {
             if (bricks[q].Destroyed != true) {
@@ -320,6 +380,7 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
         }
     }
     
+    // Загрузка уровня
     public void loadLevel(int numLevel) {
         Level NewLevel = new Level(numLevel);
 
