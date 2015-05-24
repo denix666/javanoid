@@ -6,7 +6,8 @@ package javanoid;
 */
 
 public class Main {
-
+    public static final String version = "JAVANOID v1.0";
+    
     public static final int GAME_WINDOW_WIDTH = 805;
     public static final int GAME_WINDOW_HEIGHT = 630;
     
@@ -20,6 +21,6 @@ public class Main {
     
     
     public static void main(String[] args) {
-        new Window("Level - "+curLevel+" | Lives - "+numOfLives+" | Score - "+score, GAME_WINDOW_WIDTH, GAME_WINDOW_HEIGHT);
+        new Window(version+" | Level - "+curLevel+" | Lives - "+numOfLives+" | Score - "+score, GAME_WINDOW_WIDTH, GAME_WINDOW_HEIGHT);
     }
 }

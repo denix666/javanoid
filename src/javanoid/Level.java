@@ -29,9 +29,9 @@ public class Level {
         
         // Level 1
         a[1] = "oooooooooooooo";
-        b[1] = "oooooooooooooo";
-        c[1] = "oooooooooooroo";
-        d[1] = "oooooooooooooo";
+        b[1] = "rrrrrrrrrrrrrr";
+        c[1] = "bbbbbbbbbbbbbb";
+        d[1] = "gggggggggggggg";
         e[1] = "oooooooooooooo";
         f[1] = "oooooooooooooo";
         g[1] = "oooooooooooooo";
@@ -41,9 +41,9 @@ public class Level {
         // Level 2
         a[2] = "rrrrrrrrrrrrrr";
         b[2] = "bbbbbbbbbbbbbb";
-        c[2] = "oooooooooooooo";
-        d[2] = "oooooooooooooo";
-        e[2] = "oooooooooooooo";
+        c[2] = "mmmmmmmmmmmmmm";
+        d[2] = "gggggggggggggg";
+        e[2] = "ffffffffffffff";
         f[2] = "oooooooooooooo";
         g[2] = "oooooooooooooo";
         h[2] = "oooooooooooooo";
@@ -54,32 +54,32 @@ public class Level {
         b[3] = "bbbbbbbbbbbbbb";
         c[3] = "gggggggggggggg";
         d[3] = "rrrrrrrrrrrrrr";
-        e[3] = "oooooooooooooo";
-        f[3] = "oooooooooooooo";
-        g[3] = "oooooooooooooo";
+        e[3] = "wwwwwwwwwwwwww";
+        f[3] = "yyyyyyyyyyyyyy";
+        g[3] = "mmmmmmmmmmmmmm";
         h[3] = "oooooooooooooo";
         i[3] = "oooooooooooooo";
         
         // Level 4
         a[4] = "rrrrrrrrrrrrrr";
-        b[4] = "rrrrrrrrrrrrrr";
+        b[4] = "mmmmmmmmmmmmmm";
         c[4] = "gggggggggggggg";
-        d[4] = "gggggggggggggg";
+        d[4] = "pppppppppppppp";
         e[4] = "cccccccccccccc";
-        f[4] = "cccccccccccccc";
+        f[4] = "aaaaaaaaaaaaaa";
         g[4] = "yyyyyyyyyyyyyy";
-        h[4] = "pppppppppppppp";
-        i[4] = "cccccccccccccc";
+        h[4] = "wwwwwwwwwwwwww";
+        i[4] = "oooooooooooooo";
         
         // Level 5
-        a[5] = "cccccccccccccc";
+        a[5] = "ffffffffffffff";
         b[5] = "cccccccccccccc";
-        c[5] = "cccccccccccccc";
+        c[5] = "wwwwwwwwwwwwww";
         d[5] = "gggggggggggggg";
-        e[5] = "gggggggggggggg";
-        f[5] = "gggggggggggggg";
+        e[5] = "pppppppppppppp";
+        f[5] = "bbbbbbbbbbbbbb";
         g[5] = "rrrrrrrrrrrrrr";
-        h[5] = "rrrrrrrrrrrrrr";
-        i[5] = "rrrrrrrrrrrrrr";
+        h[5] = "mmmmmmmmmmmmmm";
+        i[5] = "aaaaaaaaaaaaaa";
     }
 }

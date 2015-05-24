@@ -85,7 +85,7 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
     // Передвижение ракетки
     public void movePaddle() {
         if (paddleDirectionLeft) {
-            if (paddlePosition > 15) {
+            if (paddlePosition > 10) {
                 paddlePosition = paddlePosition - paddleStepMove;
             }
         }
@@ -105,7 +105,7 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
         if (Main.curLevel < Main.numOfLevels) {
             Main.curLevel++;
             this.background = new Img("backgrounds/bg"+Main.curLevel+".jpg");
-            frame.setTitle("Level - "+Main.curLevel+" | Lives - "+Main.numOfLives+" | Score - "+Main.score);
+            frame.setTitle(Main.version+" | Level - "+Main.curLevel+" | Lives - "+Main.numOfLives+" | Score - "+Main.score);
             loadLevel(Main.curLevel);
             levelStart();
         } else {
@@ -140,7 +140,7 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
         if (showingGameOver) {
             System.exit(0);
         }
-        frame.setTitle("Level - "+Main.curLevel+" | Lives - "+Main.numOfLives+" | Score - "+Main.score);
+        frame.setTitle(Main.version+" | Level - "+Main.curLevel+" | Lives - "+Main.numOfLives+" | Score - "+Main.score);
         gameRunning = true;
         paddlePosition = Main.GAME_AREA_WIDTH/2-50;
         ballPosX = Main.GAME_AREA_WIDTH/2-8;
@@ -234,8 +234,8 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
     @Override
     public void mouseMoved(MouseEvent e) {
         paddlePosition = e.getX();
-        if (paddlePosition < 15) {
-            paddlePosition = 15;
+        if (paddlePosition < 10) {
+            paddlePosition = 10;
         }
         
         if (paddlePosition > Main.GAME_AREA_WIDTH-100) {
@@ -296,7 +296,7 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
                     sound.play("destroyed_block.au");
                     
                     Main.score = Main.score + 25;
-                    frame.setTitle("Level - "+Main.curLevel+" | Lives - "+Main.numOfLives+" | Score - "+Main.score);
+                    frame.setTitle(Main.version+" | Level - "+Main.curLevel+" | Lives - "+Main.numOfLives+" | Score - "+Main.score);
                     if (ballDirectionDown) {
                         ballDirectionDown = false;
                         ballDirectionUp = true;
