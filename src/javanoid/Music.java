@@ -34,7 +34,7 @@ public class Music {
     
     public void loop(){
         FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-        gainControl.setValue(-15.0f);
+        gainControl.setValue(-5.0f);
         clip.loop(Clip.LOOP_CONTINUOUSLY);
     }
     

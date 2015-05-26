@@ -48,12 +48,25 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
     Img intro = new Img("intro.jpg");
     Img gameOver = new Img("game_over.jpg");
     Img ramka = new Img("frame.png");
+    Img lvlNumber = new Img("ciphers/"+Main.curLevel+".jpg");
+    Img livesNumber = new Img("ciphers/"+Main.numOfLives+".jpg");
     Img icon = new Img("icon.png");
     Timer timer = new Timer(DELAY, this);
     Level level = new Level(Main.curLevel);
     Sound sound = new Sound();
     Music music = new Music("intro.wav");
     Pause pause = new Pause();
+    
+    Img num0 = new Img("ciphers/0.jpg");
+    Img num1 = new Img("ciphers/1.jpg");
+    Img num2 = new Img("ciphers/2.jpg");
+    Img num3 = new Img("ciphers/3.jpg");
+    Img num4 = new Img("ciphers/4.jpg");
+    Img num5 = new Img("ciphers/5.jpg");
+    Img num6 = new Img("ciphers/6.jpg");
+    Img num7 = new Img("ciphers/7.jpg");
+    Img num8 = new Img("ciphers/8.jpg");
+    Img num9 = new Img("ciphers/9.jpg");
     
     public Window(String winTitle, int winWidth, int winHeight) {
         // Загрузка первого уровня
@@ -105,7 +118,9 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
         if (Main.curLevel < Main.numOfLevels) {
             Main.curLevel++;
             this.background = new Img("backgrounds/bg"+Main.curLevel+".jpg");
-            frame.setTitle(Main.version+" | Level - "+Main.curLevel+" | Lives - "+Main.numOfLives+" | Score - "+Main.score);
+            this.lvlNumber = new Img("ciphers/"+Main.curLevel+".jpg");
+            this.livesNumber = new Img("ciphers/"+Main.numOfLives+".jpg");
+            //frame.setTitle(Main.version+" | Level - "+Main.curLevel+" | Lives - "+Main.numOfLives+" | Score - "+Main.score);
             loadLevel(Main.curLevel);
             levelStart();
         } else {
@@ -126,6 +141,7 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
         gameRunning = false;
         if (Main.numOfLives > 0) {
             Main.numOfLives--;
+            this.livesNumber = new Img("ciphers/"+Main.numOfLives+".jpg");
             ballDirectionUp = true;
             ballDirectionDown = false;
             levelStart();
@@ -138,9 +154,12 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
     
     public void levelStart() {
         if (showingGameOver) {
-            System.exit(0);
+            Main.score = 0;
+            Main.numOfLives = 2;
+            Main.curLevel = 1;
+            loadLevel(Main.curLevel);
+            showingGameOver = false;
         }
-        frame.setTitle(Main.version+" | Level - "+Main.curLevel+" | Lives - "+Main.numOfLives+" | Score - "+Main.score);
         gameRunning = true;
         paddlePosition = Main.GAME_AREA_WIDTH/2-50;
         ballPosX = Main.GAME_AREA_WIDTH/2-8;
@@ -247,7 +266,6 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
         }
     }
     
-    
     // Отрисовка компонентов
     @Override
     public void paintComponent(Graphics g) {
@@ -257,6 +275,8 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
         g.drawImage(ramka.img, 0, 0, this);
         g.drawImage(paddle.img, paddlePosition, Main.GAME_AREA_HEIGHT-50, this);
         g.drawImage(ball.img, ballPosX, ballPosY, this);
+        g.drawImage(lvlNumber.img, 165, 625, this);
+        g.drawImage(livesNumber.img, 390, 627, this);
         
         for (int q=0; q<numberOfBricks; q++) {
             if (bricks[q].Destroyed != true) {
@@ -272,6 +292,7 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
             g.drawImage(gameOver.img, 0, 0, this);
         }
         
+        showScore(g);        
         repaint();
     }
     
@@ -296,7 +317,29 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
                     sound.play("destroyed_block.au");
                     
                     Main.score = Main.score + 25;
-                    frame.setTitle(Main.version+" | Level - "+Main.curLevel+" | Lives - "+Main.numOfLives+" | Score - "+Main.score);
+                    
+                    // Bonus lives
+                    if (Main.score == 2000) {
+                        Main.numOfLives++;
+                        sound.play("bonus.wav");
+                        this.livesNumber = new Img("ciphers/"+Main.numOfLives+".jpg");
+                    }
+                    if (Main.score == 7000) {
+                        Main.numOfLives++;
+                        sound.play("bonus.wav");
+                        this.livesNumber = new Img("ciphers/"+Main.numOfLives+".jpg");
+                    }
+                    if (Main.score == 10000) {
+                        Main.numOfLives++;
+                        sound.play("bonus.wav");
+                        this.livesNumber = new Img("ciphers/"+Main.numOfLives+".jpg");
+                    }
+                    if (Main.score == 15000) {
+                        Main.numOfLives++;
+                        sound.play("bonus.wav");
+                        this.livesNumber = new Img("ciphers/"+Main.numOfLives+".jpg");
+                    }
+                    
                     if (ballDirectionDown) {
                         ballDirectionDown = false;
                         ballDirectionUp = true;
@@ -377,6 +420,52 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
             if (destroyedBricks==numberOfBricks) {
                 levelCompleted();
             }
+        }
+    }
+    
+    // Отображение цифр счета
+    public void showScore(Graphics g) {
+        String s = ""+Main.score;
+        int x=630;
+        for (int i=0; i<6; i++) {
+            if (i<(6-s.length())) {
+                g.drawImage(num0.img, x, 630, this);
+            } else {
+                int n = Character.getNumericValue(s.charAt(i-(6-s.length())));
+                switch (n) {
+                    case 0:
+                        g.drawImage(num0.img, x, 630, this);
+                    break;
+                    case 1:
+                        g.drawImage(num1.img, x, 630, this);
+                    break;
+                    case 2:
+                        g.drawImage(num2.img, x, 630, this);
+                    break;
+                    case 3:
+                        g.drawImage(num3.img, x, 630, this);
+                    break;
+                    case 4:
+                        g.drawImage(num4.img, x, 630, this);
+                    break;
+                    case 5:
+                        g.drawImage(num5.img, x, 630, this);
+                    break;
+                    case 6:
+                        g.drawImage(num6.img, x, 630, this);
+                    break;
+                    case 7:
+                        g.drawImage(num7.img, x, 630, this);
+                    break;
+                    case 8:
+                        g.drawImage(num8.img, x, 630, this);
+                    break;
+                    case 9:
+                        g.drawImage(num9.img, x, 630, this);
+                    break;
+                }
+            }
+            x=x+20;
         }
     }
     
