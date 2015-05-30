@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 import javax.swing.*;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 
@@ -56,6 +57,9 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
     Sound sound = new Sound();
     Music music = new Music("intro.wav");
     Pause pause = new Pause();
+    
+    Bonus bonusLive = new Bonus("live",0,0);
+    Random rand = new Random();
     
     Img num0 = new Img("ciphers/0.jpg");
     Img num1 = new Img("ciphers/1.jpg");
@@ -174,6 +178,7 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
     public void actionPerformed(ActionEvent e) {
         movePaddle();
         moveBall();
+        moveBonuses();
     }
 
     // Прослушка клавиатуры
@@ -284,6 +289,10 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
             }
         }
         
+        if (bonusLive.inuse) {
+            g.drawImage(bonusLive.img, bonusLive.x, bonusLive.y, this);
+        }
+        
         if (showingIntro) {
             g.drawImage(intro.img, 0, 0, this);
         }
@@ -294,6 +303,23 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
         
         showScore(g);        
         repaint();
+    }
+    
+    private void moveBonuses() {
+        if (bonusLive.inuse) {
+            bonusLive.y++;
+            if (bonusLive.y > Main.GAME_AREA_HEIGHT-45) {
+                if (bonusLive.x > paddlePosition && bonusLive.x < paddlePosition+100 || bonusLive.x+50 < paddlePosition+100 && bonusLive.x+50 > paddlePosition) {
+                    sound.play("bonus.wav");
+                    bonusLive.inuse = false;
+                    Main.numOfLives++;
+                    this.livesNumber = new Img("ciphers/"+Main.numOfLives+".jpg");
+                }
+            }
+            if (bonusLive.y > Main.GAME_AREA_HEIGHT-40) {
+                bonusLive.inuse = false;
+            }
+        }
     }
     
     // Движение мячика
@@ -317,6 +343,14 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
                     sound.play("destroyed_block.au");
                     
                     Main.score = Main.score + 25;
+                    
+                    // Check if destroyed brick have bonus
+                    if (bricks[q].bonus == "live") {
+                        //Bonus bonusLive = new Bonus("live",bricks[q].x,bricks[q].y);
+                        bonusLive.x = bricks[q].x;
+                        bonusLive.y = bricks[q].y;
+                        bonusLive.inuse = true;
+                    }
                     
                     // Bonus lives
                     if (Main.score == 2000) {
@@ -418,6 +452,7 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
                 destroyedBricks++;
             }
             if (destroyedBricks==numberOfBricks) {
+                bonusLive.inuse = false;
                 levelCompleted();
             }
         }
@@ -584,6 +619,15 @@ public class Window extends JPanel implements ActionListener,MouseMotionListener
                         k++;
                         j++;
                     }
+                break;
+            }
+        }
+        
+        while (true) {
+            int r = rand.nextInt(bricks.length);
+            //System.out.println(r);
+            if (bricks[r].Destroyed != true) {
+                bricks[r].bonus = "live";
                 break;
             }
         }
