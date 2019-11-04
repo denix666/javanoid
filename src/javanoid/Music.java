@@ -11,34 +11,34 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class Music {
-    
-    private Clip clip;
-    
-    public Music(String soundFile) {
-        try {
-            InputStream audioSrc = getClass().getResourceAsStream("resources/sounds/"+soundFile);
-            InputStream bufferedIn = new BufferedInputStream(audioSrc);
-            AudioInputStream sound = AudioSystem.getAudioInputStream(bufferedIn);
-            clip = AudioSystem.getClip();
-            clip.open(sound);
-        }
-        catch (LineUnavailableException | UnsupportedAudioFileException | IOException e) {
-            System.out.println("play sound error: " + e.getMessage());
-        }
-    }
-    
-    public void play(){
-        clip.setFramePosition(0);
-        clip.start();
-    }
-    
-    public void loop(){
+
+    private Clip clip;                                                                                                                                                                                                                                                                       
+                                                                                                                                                                                                                                                                             
+    public Music(String soundFile) {                                                                                                                                                                                                                                                         
+        try {                                                                                                                                                                                                                                                                                
+            InputStream audioSrc = getClass().getResourceAsStream("/javanoid/resources/sounds/"+soundFile);                                                                                                                                                                                            
+            InputStream bufferedIn = new BufferedInputStream(audioSrc);                                                                                                                                                                                                                      
+            AudioInputStream sound = AudioSystem.getAudioInputStream(bufferedIn);                                                                                                                                                                                                            
+            clip = AudioSystem.getClip();                                                                                                                                                                                                                                                    
+            clip.open(sound);                                                                                                                                                                                                                                                                
+        }                                                                                                                                                                                                                                                                        
+        catch (LineUnavailableException | UnsupportedAudioFileException | IOException e) {                                                                                                                                                                                                   
+            System.out.println("play sound error: " + e.getMessage());                                                                                                                                                                                                                       
+        }                                                                                                                                                                                                                                                                                    
+    }                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                             
+    public void play() {                                                                                                                                                                                                                                                                      
+        clip.setFramePosition(0);                                                                                                                                                                                                                                                            
+        clip.start();                                                                                                                                                                                                                                                                        
+    }                                                                                                                                                                                                                                                                                        
+
+    public void loop() {
         FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
         gainControl.setValue(-5.0f);
         clip.loop(Clip.LOOP_CONTINUOUSLY);
     }
-    
-    public void stop(){
+
+    public void stop() {
         clip.stop();
     }
 }
